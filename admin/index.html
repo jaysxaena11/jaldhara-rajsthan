@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>एडमिन — जल धारा जयपुर</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="admin.css" />
+</head>
+<body>
+  <div id="loginView" class="login-wrap">
+    <form id="loginForm" class="login-card">
+      <h1>एडमिन लॉगिन <span class="lock">🔒</span></h1>
+      <input id="email" type="email" placeholder="ईमेल" required />
+      <input id="password" type="password" placeholder="पासवर्ड" required />
+      <button type="submit">लॉगिन</button>
+      <p id="loginErr" class="err"></p>
+    </form>
+  </div>
+  <div id="dashView" class="hidden">
+    <header class="topbar">
+      <span class="badge-secure">🔒 एडमिन पैनल</span>
+      <div class="top-right"><span id="who"></span><button id="logout">लॉगआउट</button></div>
+    </header>
+    <main class="dash">
+      <section class="stats">
+        <div class="stat"><span id="sArticles">0</span><label>लेख</label></div>
+        <div class="stat"><span id="sVlogs">0</span><label>व्लॉग</label></div>
+        <div class="stat"><span id="sCats">0</span><label>श्रेणियाँ</label></div>
+        <div class="stat"><span>20</span><label>भाषाएँ</label></div>
+      </section>
+      <section class="panel">
+        <h2>नया लेख / व्लॉग</h2>
+        <form id="createForm">
+          <input id="cTitle" placeholder="शीर्षक" required />
+          <input id="cCategory" placeholder="श्रेणी (जैसे समाचार)" />
+          <select id="cType"><option value="article">लेख</option><option value="vlog">व्लॉग</option></select>
+          <textarea id="cBody" rows="5" placeholder="सामग्री..." required></textarea>
+          <button type="submit">जोड़ें</button>
+        </form>
+      </section>
+      <section class="panel">
+        <h2>लेख प्रबंधन</h2>
+        <table class="tbl"><thead><tr><th>शीर्षक</th><th>श्रेणी</th><th>स्थिति</th><th>एक्शन</th></tr></thead>
+          <tbody id="rows"></tbody></table>
+      </section>
+    </main>
+  </div>
+  <div id="modal" class="modal hidden">
+    <div class="modal-card">
+      <p>क्या आप वाकई हटाना चाहते हैं?</p>
+      <div class="modal-actions"><button id="cancelDel">रद्द</button><button id="confirmDel" class="danger">हटाएँ</button></div>
+    </div>
+  </div>
+  <script src="admin.js"></script>
+</body>
+</html>
