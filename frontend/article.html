@@ -33,7 +33,7 @@
     <div id="body" style="font-size:17px;color:#26282e;"></div>
   </main>
   <script>
-    const API = 'http://localhost:5000/api';
+    const API = window.location.origin + '/api';
     const id = new URLSearchParams(location.search).get('id');
     const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
     const fmt = iso => { const d = new Date(iso); return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`; };

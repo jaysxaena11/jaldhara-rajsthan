@@ -1,0 +1,19 @@
+{
+  "name": "jal-dhara-jaipur-frontend",
+  "version": "1.0.0",
+  "description": "Frontend for Jal Dhara Jaipur - Hindi-primary multilingual blog platform",
+  "main": "index.html",
+  "scripts": {
+    "start": "echo \"Frontend is static HTML. Open index.html in a browser or use: npx serve .\" && npx serve .",
+    "serve": "npx serve .",
+    "dev": "npx serve . -l 3000"
+  },
+  "keywords": [
+    "hindi",
+    "blog",
+    "multilingual",
+    "jaipur"
+  ],
+  "author": "",
+  "license": "MIT"
+}

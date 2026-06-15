@@ -1,0 +1,42 @@
+services:
+  - type: web
+    name: jal-dhara-jaipur
+    env: node
+    region: singapore
+    buildCommand: cd backend && npm install
+    startCommand: cd backend && npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: MONGODB_URI
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRES_IN
+        value: 7d
+      - key: ADMIN_EMAIL
+        value: admin@example.com
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: ADMIN_NAME
+        value: Admin
+      - key: TRANSLATE_ENGINE
+        value: libretranslate
+      - key: LIBRETRANSLATE_URL
+        value: ""
+      - key: LIBRETRANSLATE_API_KEY
+        value: ""
+      - key: GOOGLE_TRANSLATE_API_KEY
+        value: ""
+      - key: BLOGGER_CLIENT_ID
+        value: ""
+      - key: BLOGGER_CLIENT_SECRET
+        value: ""
+      - key: BLOGGER_REDIRECT_URI
+        value: ""
+      - key: BLOGGER_BLOG_ID
+        value: ""
+      - key: BLOGGER_REFRESH_TOKEN
+        value: ""
