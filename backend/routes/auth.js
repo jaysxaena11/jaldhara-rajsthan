@@ -27,21 +27,19 @@ router.get('/debug-admin', async (req, res) => {
     const adminEmail = process.env.ADMIN_EMAIL;
     const adminPass = process.env.ADMIN_PASSWORD;
     
-    // Force recreate admin
+    // Force recreate admin - DON'T hash manually, model will do it
     await User.deleteMany({ email: adminEmail?.toLowerCase() });
-    const hashedPassword = await bcrypt.hash(adminPass, 10);
     const newAdmin = await User.create({
       name: 'Admin',
       email: adminEmail?.toLowerCase(),
-      password: hashedPassword,
+      password: adminPass, // Model's pre-save will hash this
       role: 'admin'
     });
     
     res.json({ 
-      message: 'Admin recreated',
+      message: 'Admin recreated (fixed double-hash issue)',
       email: newAdmin.email,
-      existingUsers: users.length,
-      envPassword: adminPass // TEMPORARY - will delete
+      existingUsers: users.length
     });
   } catch (err) {
     res.status(500).json({ error: err.message });

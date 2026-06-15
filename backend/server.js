@@ -41,12 +41,11 @@ connectDB().then(async () => {
     const User = (await import('./models/User.js')).default;
     const existingAdmin = await User.findOne({ email: process.env.ADMIN_EMAIL });
     if (!existingAdmin && process.env.ADMIN_EMAIL && process.env.ADMIN_PASSWORD) {
-      const bcrypt = (await import('bcryptjs')).default;
-      const hashedPassword = await bcrypt.hash(process.env.ADMIN_PASSWORD, 10);
+      // Don't hash manually - model's pre-save hook will do it
       await User.create({
         name: process.env.ADMIN_NAME || 'Admin',
         email: process.env.ADMIN_EMAIL,
-        password: hashedPassword,
+        password: process.env.ADMIN_PASSWORD, // Model will hash this
         role: 'admin'
       });
       console.log('✓ Admin user created automatically');
