@@ -35,6 +35,25 @@ app.get('*', (req, res) => {
 });
 
 const PORT = process.env.PORT || 5000;
-connectDB().then(() => {
+connectDB().then(async () => {
+  // Auto-seed admin user on startup if not exists
+  try {
+    const User = (await import('./models/User.js')).default;
+    const existingAdmin = await User.findOne({ email: process.env.ADMIN_EMAIL });
+    if (!existingAdmin && process.env.ADMIN_EMAIL && process.env.ADMIN_PASSWORD) {
+      const bcrypt = (await import('bcryptjs')).default;
+      const hashedPassword = await bcrypt.hash(process.env.ADMIN_PASSWORD, 10);
+      await User.create({
+        name: process.env.ADMIN_NAME || 'Admin',
+        email: process.env.ADMIN_EMAIL,
+        password: hashedPassword,
+        role: 'admin'
+      });
+      console.log('✓ Admin user created automatically');
+    }
+  } catch (err) {
+    console.log('Admin user check:', err.message);
+  }
+  
   app.listen(PORT, () => console.log(`Server: http://localhost:${PORT}`));
 }).catch((e) => { console.error(e); process.exit(1); });
