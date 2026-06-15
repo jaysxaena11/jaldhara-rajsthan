@@ -1,4 +1,6 @@
-const API = 'http://localhost:5000/api';
+// Backend API URL - Change this for production deployment
+const API = 'https://jaldhara-rajsthan-ma2b.onrender.com/api';
+// For local development, use: const API = 'http://localhost:5000/api';
 let currentSort = 'latest';
 
 function fmtDate(iso) {

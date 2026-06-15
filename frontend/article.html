@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>लेख — जल धारा जयपुर</title>
+  <title>लेख — जल धारा अभियान राजस्थान</title>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <header class="nav"><div class="nav-inner">
-    <a href="index.html" class="logo">जल <span class="logo-accent">धारा</span> जयपुर</a>
+    <a href="index.html" class="logo">जल <span class="logo-accent">धारा</span> अभियान राजस्थान</a>
     <div class="nav-right">
       <select id="langSelect" class="lang-select">
         <option value="hi" selected>हिन्दी</option>
@@ -33,7 +33,10 @@
     <div id="body" style="font-size:17px;color:#26282e;"></div>
   </main>
   <script>
-    const API = 'http://localhost:5000/api';
+    // Backend API URL - Change this for production deployment
+    const API = 'https://jaldhara-rajsthan-ma2b.onrender.com/api';
+    // For local development, use: const API = 'http://localhost:5000/api';
+    
     const id = new URLSearchParams(location.search).get('id');
     const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
     const fmt = iso => { const d = new Date(iso); return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`; };
