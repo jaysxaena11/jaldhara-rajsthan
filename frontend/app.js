@@ -39,7 +39,4 @@ document.querySelectorAll('.sort-btn').forEach(btn => {
   });
 });
 
-const langSelect = document.getElementById('langSelect');
-if (langSelect) langSelect.addEventListener('change', e => { localStorage.setItem('lang', e.target.value); });
-
 loadArticles();

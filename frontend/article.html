@@ -10,21 +10,6 @@
 <body>
   <header class="nav"><div class="nav-inner">
     <a href="index.html" class="logo">जल <span class="logo-accent">धारा</span> अभियान राजस्थान</a>
-    <div class="nav-right">
-      <select id="langSelect" class="lang-select">
-        <option value="hi" selected>हिन्दी</option>
-        <option value="en">English</option>
-        <option value="mr">मराठी</option>
-        <option value="ta">तमिल</option>
-        <option value="gu">गुजराती</option>
-        <option value="bn">बांग्ला</option>
-        <option value="pa">पंजाबी</option>
-        <option value="ur">उर्दू</option>
-        <option value="ar">العربية</option>
-        <option value="fr">Français</option>
-        <option value="ja">日本語</option>
-      </select>
-    </div>
   </div></header>
   <main class="container" style="padding-top:48px;padding-bottom:64px;max-width:760px;">
     <a href="index.html" style="color:var(--accent);font-weight:600;">← वापस</a>
@@ -33,24 +18,23 @@
     <div id="body" style="font-size:17px;color:#26282e;"></div>
   </main>
   <script>
-    // Backend API URL - Change this for production deployment
     const API = 'https://jaldhara-rajsthan-ma2b.onrender.com/api';
-    // For local development, use: const API = 'http://localhost:5000/api';
-    
     const id = new URLSearchParams(location.search).get('id');
     const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
     const fmt = iso => { const d = new Date(iso); return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`; };
-    async function load(lang) {
-      const q = lang && lang !== 'hi' ? `?lang=${lang}` : '';
-      const res = await fetch(`${API}/articles/${id}${q}`);
-      if (!res.ok) { document.getElementById('title').textContent = 'लेख नहीं मिला'; return; }
-      const a = await res.json();
-      document.getElementById('title').textContent = a.title;
-      document.getElementById('meta').innerHTML = `<span class="pill">${a.category}</span><span>${fmt(a.createdAt)}</span>`;
-      document.getElementById('body').innerHTML = a.body;
+    async function load() {
+      try {
+        const res = await fetch(`${API}/articles/${id}`);
+        if (!res.ok) { document.getElementById('title').textContent = 'लेख नहीं मिला'; return; }
+        const a = await res.json();
+        document.getElementById('title').textContent = a.title;
+        document.getElementById('meta').innerHTML = `<span class="pill">${a.category}</span><span>${fmt(a.createdAt)}</span>`;
+        document.getElementById('body').innerHTML = a.body;
+      } catch {
+        document.getElementById('title').textContent = 'सर्वर से कनेक्शन नहीं।';
+      }
     }
-    document.getElementById('langSelect').addEventListener('change', e => load(e.target.value));
-    load('hi');
+    load();
   </script>
 </body>
 </html>
