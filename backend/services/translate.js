@@ -35,15 +35,26 @@ export async function translate(text, target, source = 'hi') {
 
   const engine = process.env.TRANSLATE_ENGINE || 'libretranslate';
   let result;
+  
   try {
     result = engine === 'google'
       ? await googleTranslate(text, target, source)
       : await libreTranslate(text, target, source);
+    cache.set(cacheKey, result);
+    return result;
   } catch (e) {
-    result = engine === 'google'
-      ? await libreTranslate(text, target, source)
-      : await googleTranslate(text, target, source);
+    console.error('Translation failed:', e.message);
+    // Fallback: try the other engine
+    try {
+      result = engine === 'google'
+        ? await libreTranslate(text, target, source)
+        : await googleTranslate(text, target, source);
+      cache.set(cacheKey, result);
+      return result;
+    } catch (e2) {
+      console.error('Both translation engines failed:', e2.message);
+      // Final fallback: return original text with language note
+      return text + ' [Original: ' + source + ']';
+    }
   }
-  cache.set(cacheKey, result);
-  return result;
 }
