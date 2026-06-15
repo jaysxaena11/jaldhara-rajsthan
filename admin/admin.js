@@ -16,15 +16,32 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
   e.preventDefault();
   const email = document.getElementById('email').value;
   const password = document.getElementById('password').value;
-  const res = await fetch(`${API}/auth/login`, {
-    method: 'POST', headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, password })
-  });
-  const data = await res.json();
-  if (!res.ok) { document.getElementById('loginErr').textContent = data.error || 'लॉगिन विफल'; return; }
-  token = data.token; localStorage.setItem('token', token);
-  document.getElementById('who').textContent = data.user.name;
-  showDash();
+  const errorEl = document.getElementById('loginErr');
+  
+  errorEl.textContent = ''; // Clear previous errors
+  
+  try {
+    const res = await fetch(`${API}/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    });
+    
+    const data = await res.json();
+    
+    if (!res.ok) { 
+      errorEl.textContent = data.error || 'लॉगिन विफल। कृपया पुनः प्रयास करें।';
+      return; 
+    }
+    
+    token = data.token;
+    localStorage.setItem('token', token);
+    document.getElementById('who').textContent = data.user.name;
+    showDash();
+  } catch (error) {
+    console.error('Login error:', error);
+    errorEl.textContent = 'सर्वर से कनेक्शन विफल। backend चालू है?';
+  }
 });
 
 document.getElementById('logout').addEventListener('click', () => {
@@ -32,42 +49,100 @@ document.getElementById('logout').addEventListener('click', () => {
 });
 
 async function loadStats() {
-  const res = await fetch(`${API}/articles/admin/stats`, { headers: { Authorization: `Bearer ${token}` } });
-  if (res.status === 401) { localStorage.removeItem('token'); showLogin(); return; }
-  const s = await res.json();
-  sArticles.textContent = s.articles; sVlogs.textContent = s.vlogs; sCats.textContent = s.categories;
+  try {
+    const res = await fetch(`${API}/articles/admin/stats`, { 
+      headers: { Authorization: `Bearer ${token}` } 
+    });
+    
+    if (res.status === 401) { 
+      localStorage.removeItem('token'); 
+      showLogin(); 
+      return; 
+    }
+    
+    const s = await res.json();
+    document.getElementById('sArticles').textContent = s.articles || 0;
+    document.getElementById('sVlogs').textContent = s.vlogs || 0;
+    document.getElementById('sCats').textContent = s.categories || 0;
+  } catch (error) {
+    console.error('Error loading stats:', error);
+    // Set default values if error
+    document.getElementById('sArticles').textContent = '0';
+    document.getElementById('sVlogs').textContent = '0';
+    document.getElementById('sCats').textContent = '0';
+  }
 }
 
 async function loadRows() {
-  const res = await fetch(`${API}/articles`);
-  const articles = await res.json();
-  document.getElementById('rows').innerHTML = articles.map(a => `
-    <tr>
-      <td>${a.title}</td>
-      <td>${a.category}</td>
-      <td class="${a.status === 'published' ? 'status-pub' : 'status-draft'}">${a.status === 'published' ? 'प्रकाशित' : 'ड्राफ्ट'}</td>
-      <td>
-        <button class="act" onclick="window.open('../frontend/article.html?id=${a._id}')">👁</button>
-        <button class="act del" data-id="${a._id}">🗑</button>
-      </td>
-    </tr>`).join('');
-  document.querySelectorAll('.act.del').forEach(b => b.addEventListener('click', () => {
-    deleteId = b.dataset.id; document.getElementById('modal').classList.remove('hidden');
-  }));
+  try {
+    const res = await fetch(`${API}/articles`);
+    const articles = await res.json();
+    
+    if (!articles || articles.length === 0) {
+      document.getElementById('rows').innerHTML = '<tr><td colspan="4" style="text-align:center;">अभी कोई लेख नहीं। ऊपर से जोड़ें।</td></tr>';
+      return;
+    }
+    
+    document.getElementById('rows').innerHTML = articles.map(a => `
+      <tr>
+        <td>${a.title}</td>
+        <td>${a.category || 'समाचार'}</td>
+        <td class="${a.status === 'published' ? 'status-pub' : 'status-draft'}">${a.status === 'published' ? 'प्रकाशित' : 'ड्राफ्ट'}</td>
+        <td>
+          <button class="act" onclick="window.open('article.html?id=${a._id}', '_blank')">👁</button>
+          <button class="act del" data-id="${a._id}">🗑</button>
+        </td>
+      </tr>`).join('');
+      
+    document.querySelectorAll('.act.del').forEach(b => b.addEventListener('click', () => {
+      deleteId = b.dataset.id;
+      document.getElementById('modal').classList.remove('hidden');
+    }));
+  } catch (error) {
+    console.error('Error loading articles:', error);
+    document.getElementById('rows').innerHTML = '<tr><td colspan="4" style="text-align:center;color:red;">लेख लोड करने में त्रुटि। backend चालू है?</td></tr>';
+  }
 }
 
 document.getElementById('createForm').addEventListener('submit', async (e) => {
   e.preventDefault();
+  const title = document.getElementById('cTitle').value;
+  const category = document.getElementById('cCategory').value || 'समाचार';
+  const type = document.getElementById('cType').value;
+  const bodyContent = document.getElementById('cBody').value;
+  
   const body = {
-    title: cTitle.value, category: cCategory.value || 'समाचार',
-    type: cType.value, body: cBody.value, language: 'hi', status: 'published'
+    title: title,
+    category: category,
+    type: type,
+    body: bodyContent,
+    language: 'hi',
+    status: 'published'
   };
-  const res = await fetch(`${API}/articles`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-    body: JSON.stringify(body)
-  });
-  if (res.ok) { e.target.reset(); loadStats(); loadRows(); }
+  
+  try {
+    const res = await fetch(`${API}/articles`, {
+      method: 'POST',
+      headers: { 
+        'Content-Type': 'application/json', 
+        Authorization: `Bearer ${token}` 
+      },
+      body: JSON.stringify(body)
+    });
+    
+    if (res.ok) { 
+      e.target.reset(); 
+      loadStats(); 
+      loadRows(); 
+      alert('लेख सफलतापूर्वक जोड़ा गया!');
+    } else {
+      const error = await res.json();
+      alert('त्रुटि: ' + (error.error || 'लेख नहीं जोड़ा जा सका'));
+    }
+  } catch (error) {
+    console.error('Error creating article:', error);
+    alert('सर्वर से कनेक्शन विफल। कृपया पुनः प्रयास करें।');
+  }
 });
 
 document.getElementById('cancelDel').addEventListener('click', () => document.getElementById('modal').classList.add('hidden'));
