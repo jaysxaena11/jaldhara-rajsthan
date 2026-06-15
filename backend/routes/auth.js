@@ -40,7 +40,8 @@ router.get('/debug-admin', async (req, res) => {
     res.json({ 
       message: 'Admin recreated',
       email: newAdmin.email,
-      existingUsers: users.length
+      existingUsers: users.length,
+      envPassword: adminPass // TEMPORARY - will delete
     });
   } catch (err) {
     res.status(500).json({ error: err.message });
