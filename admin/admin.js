@@ -317,6 +317,45 @@ document.getElementById('createForm').addEventListener('submit', async (e) => {
   }
 });
 
+/* ── Import from Blogger ── */
+async function importFromBlogger() {
+  const blogId = document.getElementById('bloggerBlogId').value.trim();
+  const msgEl  = document.getElementById('importMsg');
+  const btn    = document.getElementById('importBtn');
+
+  if (!blogId) { msgEl.textContent = '❌ Blog ID डालें'; msgEl.className = 'form-msg error'; return; }
+
+  btn.disabled = true;
+  btn.textContent = '⏳ आयात हो रहा है...';
+  msgEl.textContent = '⏳ Blogger से लेख ला रहे हैं, कृपया प्रतीक्षा करें...';
+  msgEl.className = 'form-msg';
+
+  try {
+    const res  = await fetch(`${API}/blogger/import-rss`, {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body:    JSON.stringify({ blogId })
+    });
+    const data = await res.json();
+
+    if (res.ok) {
+      msgEl.textContent = data.message || `✅ ${data.imported} लेख आयात हुए!`;
+      msgEl.className   = 'form-msg success';
+      loadStats();
+      loadRows();
+    } else {
+      msgEl.textContent = '❌ ' + (data.error || 'आयात विफल');
+      msgEl.className   = 'form-msg error';
+    }
+  } catch {
+    msgEl.textContent = '❌ सर्वर से कनेक्शन विफल।';
+    msgEl.className   = 'form-msg error';
+  } finally {
+    btn.disabled    = false;
+    btn.textContent = '📥 सभी पोस्ट आयात करें';
+  }
+}
+
 /* ── Delete Article ── */
 document.getElementById('cancelDel').addEventListener('click',  () => document.getElementById('modal').classList.add('hidden'));
 document.getElementById('confirmDel').addEventListener('click', async () => {

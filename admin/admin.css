@@ -158,3 +158,13 @@ body { font-family:'Noto Sans Devanagari',system-ui,sans-serif; background:var(-
   border-radius: 6px;
   border-left: 3px solid var(--accent);
 }
+
+/* ── Blogger Import ── */
+.import-box { display:flex; flex-direction:column; gap:12px; }
+.import-desc { color:var(--muted); font-size:14px; }
+.import-row { display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
+.import-row input { font-family:inherit; padding:11px 13px; border:1.5px solid var(--border); border-radius:9px; font-size:15px; flex:1; min-width:200px; }
+.import-row button { font-family:inherit; cursor:pointer; border:none; background:#2f9e6f; color:#fff; padding:11px 20px; border-radius:9px; font-weight:700; font-size:15px; white-space:nowrap; }
+.import-row button:disabled { background:#aaa; cursor:not-allowed; }
+.form-msg.success { color:var(--green); font-weight:600; }
+.form-msg.error   { color:var(--red);   font-weight:600; }

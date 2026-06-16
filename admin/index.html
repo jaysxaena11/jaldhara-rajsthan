@@ -72,7 +72,16 @@
       </section>
 
       <section class="panel">
-        <h2>📋 लेख प्रबंधन</h2>
+        <h2>📥 Blogger से लेख आयात करें</h2>
+        <div class="import-box">
+          <p class="import-desc">आपके Blogger ब्लॉग के सभी पोस्ट यहाँ आयात करें।</p>
+          <div class="import-row">
+            <input id="bloggerBlogId" value="1094692514066595996" placeholder="Blogger Blog ID" />
+            <button id="importBtn" onclick="importFromBlogger()">📥 सभी पोस्ट आयात करें</button>
+          </div>
+          <p id="importMsg" class="form-msg"></p>
+        </div>
+      </section>
         <table class="tbl">
           <thead><tr><th>शीर्षक</th><th>श्रेणी</th><th>स्थिति</th><th>एक्शन</th></tr></thead>
           <tbody id="rows"></tbody>
