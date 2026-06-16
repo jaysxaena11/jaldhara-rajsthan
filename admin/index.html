@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>एडमिन — जल धारा अभियान राजस्थान</title>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <!-- Quill Rich Text Editor -->
+  <link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet" />
   <link rel="stylesheet" href="admin.css" />
 </head>
 <body>
@@ -17,6 +19,7 @@
       <p id="loginErr" class="err"></p>
     </form>
   </div>
+
   <div id="dashView" class="hidden">
     <header class="topbar">
       <span class="badge-secure">🔒 एडमिन पैनल</span>
@@ -27,31 +30,64 @@
         <div class="stat"><span id="sArticles">0</span><label>लेख</label></div>
         <div class="stat"><span id="sVlogs">0</span><label>व्लॉग</label></div>
         <div class="stat"><span id="sCats">0</span><label>श्रेणियाँ</label></div>
-        <div class="stat"><span>20</span><label>भाषाएँ</label></div>
+        <div class="stat"><span>हिन्दी</span><label>भाषा</label></div>
       </section>
+
       <section class="panel">
-        <h2>नया लेख / व्लॉग</h2>
+        <h2>✍️ नया लेख / व्लॉग जोड़ें</h2>
         <form id="createForm">
-          <input id="cTitle" placeholder="शीर्षक" required />
-          <input id="cCategory" placeholder="श्रेणी (जैसे समाचार)" />
-          <select id="cType"><option value="article">लेख</option><option value="vlog">व्लॉग</option></select>
-          <textarea id="cBody" rows="5" placeholder="सामग्री..." required></textarea>
-          <button type="submit">जोड़ें</button>
+          <input id="cTitle" placeholder="शीर्षक लिखें..." required />
+          <div class="form-row">
+            <input id="cCategory" placeholder="श्रेणी (जैसे: समाचार, राजनीति, खेल)" />
+            <select id="cType">
+              <option value="article">📄 लेख</option>
+              <option value="vlog">🎥 व्लॉग</option>
+            </select>
+          </div>
+
+          <!-- Featured Image Upload -->
+          <div class="upload-area" id="uploadArea">
+            <input type="file" id="featuredImage" accept="image/*" hidden />
+            <div id="uploadPlaceholder" onclick="document.getElementById('featuredImage').click()">
+              🖼️ <strong>मुख्य चित्र जोड़ें</strong><br/>
+              <small>क्लिक करें या छवि खींचें (JPG, PNG, WebP)</small>
+            </div>
+            <img id="imagePreview" src="" alt="preview" class="hidden" />
+            <button type="button" id="removeImage" class="remove-btn hidden">✕ चित्र हटाएं</button>
+          </div>
+
+          <!-- Rich Text Editor -->
+          <div class="editor-wrap">
+            <label class="editor-label">📝 सामग्री (टेक्स्ट + चित्र)</label>
+            <div id="quillEditor"></div>
+          </div>
+
+          <button type="submit" class="submit-btn">✅ लेख प्रकाशित करें</button>
+          <p id="formMsg" class="form-msg"></p>
         </form>
       </section>
+
       <section class="panel">
-        <h2>लेख प्रबंधन</h2>
-        <table class="tbl"><thead><tr><th>शीर्षक</th><th>श्रेणी</th><th>स्थिति</th><th>एक्शन</th></tr></thead>
-          <tbody id="rows"></tbody></table>
+        <h2>📋 लेख प्रबंधन</h2>
+        <table class="tbl">
+          <thead><tr><th>शीर्षक</th><th>श्रेणी</th><th>स्थिति</th><th>एक्शन</th></tr></thead>
+          <tbody id="rows"></tbody>
+        </table>
       </section>
     </main>
   </div>
+
   <div id="modal" class="modal hidden">
     <div class="modal-card">
-      <p>क्या आप वाकई हटाना चाहते हैं?</p>
-      <div class="modal-actions"><button id="cancelDel">रद्द</button><button id="confirmDel" class="danger">हटाएँ</button></div>
+      <p>क्या आप वाकई यह लेख हटाना चाहते हैं?</p>
+      <div class="modal-actions">
+        <button id="cancelDel">रद्द करें</button>
+        <button id="confirmDel" class="danger">हाँ, हटाएँ</button>
+      </div>
     </div>
   </div>
+
+  <script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
   <script src="admin.js"></script>
 </body>
 </html>
