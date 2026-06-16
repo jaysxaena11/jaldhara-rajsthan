@@ -17,10 +17,10 @@ if (token) showDash(); else showLogin();
 
 /* ── Init Quill Rich Text Editor ── */
 function initQuill() {
-  if (quill) return; // already initialized
+  if (quill) return;
   quill = new Quill('#quillEditor', {
     theme: 'snow',
-    placeholder: 'यहाँ लेख लिखें... टेक्स्ट के साथ चित्र भी जोड़ सकते हैं।',
+    placeholder: 'यहाँ लेख लिखें... कर्सर जहाँ रखें, वहीं चित्र जुड़ेगा।',
     modules: {
       toolbar: [
         [{ header: [1, 2, 3, false] }],
@@ -29,13 +29,13 @@ function initQuill() {
         [{ list: 'ordered' }, { list: 'bullet' }],
         [{ align: [] }],
         ['blockquote'],
-        ['link', 'image'],   // image button inside editor
+        ['link', 'image'],
         ['clean']
       ]
     }
   });
 
-  // Handle image insertion inside editor via URL or base64
+  // Insert image at cursor position
   const toolbar = quill.getModule('toolbar');
   toolbar.addHandler('image', () => {
     const input = document.createElement('input');
@@ -50,9 +50,103 @@ function initQuill() {
         const range = quill.getSelection(true);
         quill.insertEmbed(range.index, 'image', e.target.result);
         quill.setSelection(range.index + 1);
+        // Show image toolbar after insert
+        setTimeout(() => setupImageControls(), 100);
       };
       reader.readAsDataURL(file);
     };
+  });
+
+  // Show image controls when clicking any image in editor
+  quill.root.addEventListener('click', (e) => {
+    if (e.target.tagName === 'IMG') {
+      selectImage(e.target);
+    } else {
+      deselectImage();
+    }
+  });
+}
+
+/* ── Image Position Controls ── */
+let selectedImg = null;
+
+function selectImage(img) {
+  deselectImage(); // remove previous selection
+  selectedImg = img;
+  img.classList.add('img-selected');
+
+  // Create floating toolbar
+  const toolbar = document.createElement('div');
+  toolbar.id = 'imgToolbar';
+  toolbar.innerHTML = `
+    <span class="img-tb-label">📐 चित्र संरेखण:</span>
+    <button onclick="alignImg('left')"   title="बाएं">⬅ बाएं</button>
+    <button onclick="alignImg('center')" title="बीच में">⬛ बीच</button>
+    <button onclick="alignImg('right')"  title="दाएं">दाएं ➡</button>
+    <span class="img-tb-label">📏 आकार:</span>
+    <button onclick="resizeImg('25%')"  title="छोटा">छोटा</button>
+    <button onclick="resizeImg('50%')"  title="मध्यम">मध्यम</button>
+    <button onclick="resizeImg('75%')"  title="बड़ा">बड़ा</button>
+    <button onclick="resizeImg('100%')" title="पूरा">पूरा</button>
+    <button onclick="deselectImage()" class="img-tb-close" title="बंद करें">✕</button>
+  `;
+
+  // Position toolbar just above the image
+  const editorRect = document.getElementById('quillEditor').getBoundingClientRect();
+  const imgRect = img.getBoundingClientRect();
+  toolbar.style.top  = (imgRect.top - editorRect.top + document.getElementById('quillEditor').scrollTop - 50) + 'px';
+  toolbar.style.left = '0px';
+
+  document.getElementById('quillEditor').style.position = 'relative';
+  document.getElementById('quillEditor').appendChild(toolbar);
+}
+
+function deselectImage() {
+  if (selectedImg) {
+    selectedImg.classList.remove('img-selected');
+    selectedImg = null;
+  }
+  const tb = document.getElementById('imgToolbar');
+  if (tb) tb.remove();
+}
+
+function alignImg(pos) {
+  if (!selectedImg) return;
+  // Reset
+  selectedImg.style.display   = 'block';
+  selectedImg.style.marginLeft  = '';
+  selectedImg.style.marginRight = '';
+  selectedImg.style.float       = '';
+
+  if (pos === 'left') {
+    selectedImg.style.float       = 'left';
+    selectedImg.style.marginRight = '16px';
+    selectedImg.style.marginBottom = '8px';
+  } else if (pos === 'right') {
+    selectedImg.style.float      = 'right';
+    selectedImg.style.marginLeft = '16px';
+    selectedImg.style.marginBottom = '8px';
+  } else {
+    selectedImg.style.marginLeft  = 'auto';
+    selectedImg.style.marginRight = 'auto';
+  }
+  // Re-show toolbar
+  selectImage(selectedImg);
+}
+
+function resizeImg(size) {
+  if (!selectedImg) return;
+  selectedImg.style.width    = size;
+  selectedImg.style.height   = 'auto';
+  selectedImg.style.maxWidth = '100%';
+  selectImage(selectedImg);
+}
+
+function setupImageControls() {
+  // Auto-attach click to all images already in editor
+  quill.root.querySelectorAll('img').forEach(img => {
+    img.style.cursor = 'pointer';
+    img.title = 'क्लिक करें: संरेखण और आकार बदलें';
   });
 }
 
